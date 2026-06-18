@@ -9,7 +9,7 @@ import { retornaClientes } from "./services/clientesServices.js";
 
 const app = express();
 
-app.get("/clientes", async (req: Request, res: Response) => {
+app.get("/leads", async (req: Request, res: Response) => {
   try {
     const clientes = await retornaClientes();
     res.json(clientes);
