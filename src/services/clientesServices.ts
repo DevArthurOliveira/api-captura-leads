@@ -18,11 +18,11 @@ export async function retornaLeads(): Promise<Leads[]> {
   return leads as Leads[];
 }
 
-export async function retornaLeadsId(id: number): Promise<Leads> {
+export async function retornaLeadsId(id: number): Promise<Leads | null> {
   const query = "SELECT * FROM leads WHERE id = ?";
   const valores = id;
 
   const leads = await retornaQuery<Leads[]>(query, [valores]);
 
-  return leads[0];
+  return leads[0] ?? null;
 }

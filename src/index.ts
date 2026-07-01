@@ -12,9 +12,12 @@ const app = express();
 app.get("/leads", async (req: Request, res: Response) => {
   try {
     const clientes = await retornaLeads();
-    res.json(clientes);
+
+    return res.status(200).json(clientes);
   } catch (erro) {
-    res.status(500).json("Erro: erro interno do servidor");
+    console.error(erro);
+
+    return res.status(500).json("Erro: erro interno do servidor");
   }
 });
 
