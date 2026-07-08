@@ -7,3 +7,5 @@ export type Leads = {
   criado_em: Date;
   atualizado_em: Date;
 };
+
+export type NovoLead = Omit<Leads, "id" | "criado_em" | "atualizado_em">;

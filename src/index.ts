@@ -5,9 +5,15 @@ dotenv.config();
 import express from "express";
 import type { Response, Request } from "express";
 import pool from "./database/conexao.js";
-import { retornaLeads, retornaLeadsId } from "./services/clientesServices.js";
+import {
+  cadastraLead,
+  retornaLeads,
+  retornaLeadsId,
+} from "./services/clientesServices.js";
+import { error } from "node:console";
 
 const app = express();
+app.use(express.json());
 
 app.get("/leads", async (req: Request, res: Response) => {
   try {
@@ -41,6 +47,34 @@ app.get("/leads/:id", async (req: Request, res: Response) => {
     return res.status(200).json(lead);
   } catch (erro) {
     console.error(erro);
+    return res.status(500).json({ error: "erro interno no servidor" });
+  }
+});
+
+app.post("/leads", async (req: Request, res: Response) => {
+  const { nome, email, telefone, empresa } = req.body;
+
+  if (!nome.trim()) {
+    return res.status(400).json({ error: "Insira um nome" });
+  }
+
+  if (!email.trim()) {
+    return res.status(400).json({ error: "Insira um email" });
+  }
+
+  if (!telefone.trim()) {
+    return res.status(400).json({ error: "Insira um telefone" });
+  }
+  if (!empresa.trim()) {
+    return res.status(400).json({ error: "Insira uma empresa" });
+  }
+  const novoLead = { nome, email, telefone, empresa };
+
+  try {
+    await cadastraLead(novoLead);
+    return res.status(201).json({ mensagem: "Cadastro feito com sucesso." });
+  } catch (erro) {
+    console.error({ erro: erro });
     return res.status(500).json({ error: "erro interno no servidor" });
   }
 });
