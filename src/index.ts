@@ -11,6 +11,7 @@ import {
   retornaLeadsId,
 } from "./services/clientesServices.js";
 import { error } from "node:console";
+import { validaLeads } from "./validators/leadValidator.js";
 
 const app = express();
 app.use(express.json());
@@ -54,28 +55,22 @@ app.get("/leads/:id", async (req: Request, res: Response) => {
 app.post("/leads", async (req: Request, res: Response) => {
   const { nome, email, telefone, empresa } = req.body;
 
-  if (!nome.trim()) {
-    return res.status(400).json({ error: "Insira um nome" });
-  }
-
-  if (!email.trim()) {
-    return res.status(400).json({ error: "Insira um email" });
-  }
-
-  if (!telefone.trim()) {
-    return res.status(400).json({ error: "Insira um telefone" });
-  }
-  if (!empresa.trim()) {
-    return res.status(400).json({ error: "Insira uma empresa" });
-  }
   const novoLead = { nome, email, telefone, empresa };
 
   try {
+    validaLeads(novoLead);
     await cadastraLead(novoLead);
     return res.status(201).json({ mensagem: "Cadastro feito com sucesso." });
   } catch (erro) {
-    console.error({ erro: erro });
-    return res.status(500).json({ error: "erro interno no servidor" });
+    if (erro instanceof Error) {
+      return res.status(400).json({
+        error: erro.message,
+      });
+    }
+
+    return res.status(500).json({
+      error: "Erro interno no servidor.",
+    });
   }
 });
 
