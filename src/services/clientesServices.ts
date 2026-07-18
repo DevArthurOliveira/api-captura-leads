@@ -44,3 +44,21 @@ export async function cadastraLead(
 
   return cadastro;
 }
+
+export async function atualizaLeads(
+  novoLead: NovoLead,
+  id: number,
+): Promise<ResultSetHeader> {
+  const query =
+    "UPDATE leads SET nome = ?, email = ?, telefone = ?, empresa = ? WHERE id = ?";
+  const { nome, email, telefone, empresa } = novoLead;
+
+  const leadAtualizado = await retornaQuery<ResultSetHeader>(query, [
+    nome,
+    email,
+    telefone,
+    empresa,
+    id,
+  ]);
+  return leadAtualizado;
+}
