@@ -62,3 +62,10 @@ export async function atualizaLeads(
   ]);
   return leadAtualizado;
 }
+
+export async function deletaLeadId(id: number): Promise<ResultSetHeader> {
+  const query = "DELETE FROM leads WHERE id = ?";
+
+  const leadDeletado = await retornaQuery<ResultSetHeader>(query, [id]);
+  return leadDeletado;
+}

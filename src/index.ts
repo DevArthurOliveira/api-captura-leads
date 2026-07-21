@@ -7,6 +7,7 @@ import type { Response, Request } from "express";
 import {
   atualizaLeads,
   cadastraLead,
+  deletaLeadId,
   retornaLeads,
   retornaLeadsId,
 } from "./services/clientesServices.js";
@@ -97,8 +98,7 @@ app.put("/leads/:id", async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Lead não encontrado" });
     }
 
-    const leadAtualizado = await atualizaLeads(novoLead, id);
-    console.log(leadAtualizado);
+    await atualizaLeads(novoLead, id);
 
     return res.status(200).json({ mensagem: "Lead atualizado com sucesso." });
   } catch (erro) {
@@ -110,6 +110,32 @@ app.put("/leads/:id", async (req: Request, res: Response) => {
     return res.status(500).json({
       error: "Erro interno no servidor.",
     });
+  }
+});
+
+app.delete("/leads/:id", async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+
+  if (isNaN(id)) {
+    return res.status(400).json({ error: "ID deve ser um número" });
+  }
+
+  if (id <= 0) {
+    return res.status(400).json({ error: "ID inválido" });
+  }
+
+  try {
+    const lead = await retornaLeadsId(id);
+
+    if (!lead) {
+      return res.status(404).json({ error: "Lead não encontrado" });
+    }
+
+    await deletaLeadId(id);
+    return res.status(200).json({ mensagem: "Lead deletado com sucesso." });
+  } catch (erro) {
+    console.error(erro);
+    return res.status(500).json({ error: "erro interno no servidor" });
   }
 });
 
