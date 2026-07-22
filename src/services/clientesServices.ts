@@ -19,6 +19,14 @@ export async function retornaLeads(): Promise<Leads[]> {
   return leads as Leads[];
 }
 
+export async function retornaLeadsNome(nome: string): Promise<Leads[]> {
+  const query = "SELECT * FROM leads WHERE nome LIKE ?";
+  const valores = `%${nome}%`;
+  const lead = await retornaQuery<Leads[]>(query, [valores]);
+
+  return lead;
+}
+
 export async function retornaLeadsId(id: number): Promise<Leads | null> {
   const query = "SELECT * FROM leads WHERE id = ?";
   const valores = id;

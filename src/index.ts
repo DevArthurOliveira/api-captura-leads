@@ -10,6 +10,7 @@ import {
   deletaLeadId,
   retornaLeads,
   retornaLeadsId,
+  retornaLeadsNome,
 } from "./services/clientesServices.js";
 import { validaLeads } from "./validators/leadValidator.js";
 import { NovoLead } from "./types/usuario.js";
@@ -18,9 +19,18 @@ const app = express();
 app.use(express.json());
 
 app.get("/leads", async (req: Request, res: Response) => {
-  try {
-    const clientes = await retornaLeads();
+  const nome = req.query.nome;
 
+  try {
+    if (typeof nome !== "string") {
+      const clientes = await retornaLeads();
+      return res.status(200).json(clientes);
+    }
+
+    const clientes = await retornaLeadsNome(nome);
+    if (clientes.length === 0) {
+      return res.status(404).json({ error: "Lead não encontrado" });
+    }
     return res.status(200).json(clientes);
   } catch (erro) {
     console.error(erro);
