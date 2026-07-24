@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import express from "express";
+import jwt from "jsonwebtoken";
 import type { Response, Request } from "express";
 import {
   atualizaLeads,
@@ -13,12 +14,38 @@ import {
   retornaLeadsNome,
 } from "./services/clientesServices.js";
 import { validaLeads } from "./validators/leadValidator.js";
-import { NovoLead } from "./types/usuario.js";
+import { autenticaToken } from "./middleware/middleware.js";
+import { users } from "./database/data.js";
+import { login } from "./services/authServices.js";
+import { SECRET } from "./config/auth.js";
 
 const app = express();
 app.use(express.json());
 
-app.get("/leads", async (req: Request, res: Response) => {
+app.post("/login", (req: Request, res: Response) => {
+  const { username, password } = req.body;
+  const secret = process.env.SECRET_KEY;
+
+  if (!SECRET) {
+    return res.status(500).json({
+      error: "Erro de configuração.",
+    });
+  }
+
+  const user = login(username, password);
+
+  if (!user) {
+    return res.status(403).json({ mensagem: "Usuário ou senha inválidos" });
+  }
+
+  const token = jwt.sign({ id: user.id, username: user.username }, SECRET, {
+    expiresIn: "1h",
+  });
+
+  res.status(200).json(token);
+});
+
+app.get("/leads", autenticaToken, async (req: Request, res: Response) => {
   const nome = req.query.nome;
 
   try {
